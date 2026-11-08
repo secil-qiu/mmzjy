@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="AAPd2Wtao3bcc7WP9kgdFR">
+<head data-page-node-id="4KuGWulFwP6QpVD82B1gEP">
+  <meta charset="UTF-8" data-page-node-id="PpNWtiJ9ixrpCLuMSzv7C8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="xUq76mUG5bsiIFajKtUFAD">
+  <title>甲油库 · 指甲油出入库管理</title>
+  <!-- 资源版本号：发布新版本时递增 v 值，强制浏览器拉取最新文件（防缓存旧版） -->
+  <link rel="stylesheet" href="styles.css?v=20261024c" data-page-node-id="XLEGM6mgvREL4oXgRXvPi8">
+  <script src="vendor/workbuddy-cloud-sdk.global.js?v=20261024c"></script>
+  <script src="vendor/chart.umd.min.js?v=20261024c"></script>
+</head>
+<body data-page-node-id="bQynGwgAvK0lhfEb4gXcQL">
+
+  <!-- ============ 主应用（本地单机模式，无需登录） ============ -->
+  <div id="app-view" data-page-node-id="HxdAqGDUITietidDMpldal">
+    <header class="app-header" data-page-node-id="Gxuuxuh6GSg3swWjuEe1of">
+      <div class="header-inner" data-page-node-id="ttqOyiHpvp1AOWwXApEKPW">
+        <div class="header-brand" data-page-node-id="D6bQd7FzG0heR9OcNl3Q0I">
+          <div class="brand-mark small" data-page-node-id="uTlnT0wvGx5e8a0MDfZQV4"></div>
+          <div class="header-titles" data-page-node-id="E57n7JCQ4VoGEg0gCy7qVI">
+            <span class="header-title" data-page-node-id="6rVJLfYOn3GJNTpFpTxbHX">甲油库</span>
+            <span class="header-sub" data-page-node-id="3QURJLBrH2GCl4twakzHkM">指甲油出入库与实色管理</span>
+          </div>
+        </div>
+        <div class="header-right" data-page-node-id="ypACJIdP9VGWh4Rlxht2Tk">
+          <span class="local-badge" title="数据仅保存在本机浏览器，不会上传">本地模式</span>
+          <button id="btn-export" type="button" class="btn-ghost btn-sm" title="导出全部数据为 JSON 备份文件">备份</button>
+          <button id="btn-import" type="button" class="btn-ghost btn-sm" title="从备份文件恢复数据">恢复</button>
+          <input id="file-import" type="file" accept="application/json,.json" class="visually-hidden">
+        </div>
+      </div>
+      <nav class="app-nav" data-page-node-id="dEqAAIvNhsHakTpI4uCQF3">
+        <div class="nav-inner" data-page-node-id="a6aChFnHytGF4lLVoXZjGp">
+          <div class="nav-tabs" data-page-node-id="kqGv3Xxd1teilVCwUTiDDs">
+            <button class="nav-tab active" type="button" data-view="dashboard" data-page-node-id="caHxuxqSTCyvoqopBNKdTw">工作台</button>
+            <button class="nav-tab" type="button" data-view="inventory" data-page-node-id="qqaT8ZbQODK6W9ZfldxCqj">库存</button>
+            <button class="nav-tab" type="button" data-view="sold" data-page-node-id="GoxzYypQ5urhO49oXuas6Q">已售出</button>
+            <button class="nav-tab" type="button" data-view="palette" data-page-node-id="S6hsNqtPeoOn40Yb8XdDrb">色卡</button>
+          </div>
+          <button id="btn-open-stockin" type="button" class="btn-primary btn-stockin" data-page-node-id="fqtWa9eUVmH0QkWXXi7j3Y">入库</button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="app-main" data-page-node-id="Bq8IBs6CRs37KeNEdk1UY3">
+      <section id="view-dashboard" class="view" data-page-node-id="O4X839jPfSKY8KTa2mLz7q"></section>
+
+      <section id="view-inventory" class="view hidden" data-page-node-id="ZrfCu2gwAiEFZuLq2bEQZa">
+        <div class="toolbar" data-page-node-id="RUmDFHJ9jykti3GHRsXiUf">
+          <input id="filter-search" type="search" placeholder="搜索品牌 / 系列 / 色号 / 色系" class="toolbar-search" data-page-node-id="6P4l8FKIFvIzWREkKXq5wC">
+          <select id="filter-brand" class="toolbar-select" data-page-node-id="lbAKu70TofSO9zm6Gc6qO7"><option value="" data-page-node-id="Pn87m4kt4TRmfpgpl8BTL4">全部品牌</option></select>
+          <select id="filter-series" class="toolbar-select" data-page-node-id="SAwurHWqD1gwUXukWb2fec"><option value="" data-page-node-id="9FhySc7AtbE1PPGSnnY2uh">全部系列</option></select>
+          <select id="filter-family" class="toolbar-select" data-page-node-id="fFam001"><option value="">全部色系</option></select>
+          <button id="btn-manage-families" type="button" class="btn-ghost btn-sm toolbar-manage" title="统一管理色系标签（添加 / 删除）">色系管理</button>
+          <select id="filter-sort" class="toolbar-select" data-page-node-id="KLFnVTF9NrZS8sfsOPugHP">
+            <option value="newest" data-page-node-id="yknXb23bnH5yAF9IIIRxFC">最新入库</option>
+            <option value="price-desc" data-page-node-id="4BT5tGWXDWQ8PHY2xMD6Db">购入价从高到低</option>
+            <option value="price-asc" data-page-node-id="it9AODuUIfWprpL82W9New">购入价从低到高</option>
+            <option value="brand" data-page-node-id="etxH8nrKv8ZBszvziJGomh">按品牌</option>
+          </select>
+        </div>
+        <div id="inventory-grid" class="card-grid" data-page-node-id="9Cyy7hnhvEVmxtftDYuVmG"></div>
+      </section>
+
+      <section id="view-sold" class="view hidden" data-page-node-id="A0Daa5JPuhIxks6Ci9E9Zg">
+        <div id="sold-grid" class="card-grid" data-page-node-id="J4Fav9TNpdi1K1t9OFBxIl"></div>
+      </section>
+
+      <section id="view-palette" class="view hidden" data-page-node-id="UOeAaxDe1sz5AIxikyu0kf"></section>
+    </main>
+  </div>
+
+  <!-- ============ 入库 / 编辑模态框 ============ -->
+  <div id="modal-stockin" class="modal-overlay hidden" data-page-node-id="nox9LXeAQC1YvURPJhgFBM">
+    <div class="modal modal-lg" data-page-node-id="kF97nwPQLaxB2snELU3Pti">
+      <div class="modal-head" data-page-node-id="zCTLJ0xyuPmCQaGpEuDuc8">
+        <h3 id="stockin-title" data-page-node-id="WYfWpH5vkpkLse9CGyq0xV">甲油入库</h3>
+        <button class="modal-close" type="button" data-close="modal-stockin" data-page-node-id="fZzXtQaRSVa1B5p951xDuK">×</button>
+      </div>
+      <div class="modal-body" data-page-node-id="cuoFcTtgWmfPkYbFw15Ign">
+        <div id="stockin-tabs" class="tabs" data-page-node-id="Wn9uxM77623hzz4uR3jCTF">
+          <button class="tab active" type="button" data-tab="ai" data-page-node-id="fSegKYNGp9H5lQnGOFbfHZ">截图识别入库</button>
+          <button class="tab" type="button" data-tab="manual" data-page-node-id="lPaC4AdxUb6YnPvTDJ9CF5">手动录入</button>
+        </div>
+
+        <div id="tab-ai" class="tab-pane" data-page-node-id="BnLTg0vYZWBjmUgNoi0SJZ">
+          <div id="dropzone" class="dropzone" data-page-node-id="hUV2I6Kapv1ceaHRnf8gS0">
+            <input id="file-screenshot" type="file" accept="image/*" class="visually-hidden" data-page-node-id="flcktxlijF9Bq8PQllaxyy">
+            <div class="dropzone-content" data-page-node-id="aCHnxzoxHlgyTi3ZLDy5Ld">
+              <div class="dropzone-icon" data-page-node-id="veNxIUMVBOhbeoxVj6G2f8"></div>
+              <p class="dropzone-main" data-page-node-id="SLdf3WImnrGX9UCB7jWK9C">点击或拖拽上传购买截图</p>
+              <p class="dropzone-hint" data-page-node-id="4j2DRFGLqBAhiooHnTg88u">支持淘宝 / 京东 / 代购等订单截图，一张截图含多个商品时会逐项列出，可逐项确认后统一入库</p>
+            </div>
+          </div>
+          <div id="screenshot-preview" class="screenshot-preview hidden" data-page-node-id="AvaQs7LaJ5nx1fjb3JRxzG">
+            <img id="screenshot-img" alt="购买截图预览" data-page-node-id="FNzmGuepiJj0B0wOGD9o2d">
+            <div class="screenshot-meta" data-page-node-id="kjl11RRQMC7prjFA4bJCUl">
+              <span id="screenshot-name" class="screenshot-name" data-page-node-id="tQBnkEMBcYbDUWDVY0GRsV"></span>
+              <span class="screenshot-actions" data-page-node-id="QKGgR3QlKb3DRxyIBdxzOB">
+                <button id="btn-recognize" type="button" class="btn-primary btn-sm" data-page-node-id="Sosg1pA2G1gxHCdROGe15O">AI 识别提取</button>
+                <button id="btn-rescreenshot" type="button" class="btn-ghost btn-sm" data-page-node-id="xsATayTOb30sVKHSPFhA4u">重新选择</button>
+              </span>
+            </div>
+          </div>
+          <p id="recognize-status" class="recognize-status" data-page-node-id="aP3s8PrPaI24HZUJBOiCHv"></p>
+
+          <!-- 多商品识别结果：逐项确认 + 统一录入 -->
+          <div id="recognize-results" class="recognize-results hidden" data-page-node-id="rRes001">
+            <div class="results-head">
+              <span id="results-count" class="results-count"></span>
+              <div class="results-head-actions">
+                <button id="btn-add-recognize-item" type="button" class="btn-ghost btn-sm">+ 添加一项</button>
+                <button id="btn-rerecognize" type="button" class="btn-ghost btn-sm">重新识别</button>
+              </div>
+            </div>
+            <div id="recognize-item-list" class="recognize-item-list"></div>
+            <div class="batch-bar">
+              <span class="batch-label">统一设置</span>
+              <input id="batch-series" type="text" class="batch-input batch-channel" placeholder="系列，应用到全部">
+              <input id="batch-price" type="number" min="0" step="0.01" class="batch-input batch-date" placeholder="金额 ¥，应用到全部">
+              <select id="batch-family" class="batch-input batch-family"><option value="">色系，应用到全部</option></select>
+              <input id="batch-family-custom" type="text" class="batch-input batch-family-custom hidden" maxlength="12" placeholder="自定义色系">
+              <button id="btn-apply-batch" type="button" class="btn-ghost btn-sm">应用到全部</button>
+            </div>
+            <div class="results-foot">
+              <button id="btn-confirm-recognize" type="button" class="btn-primary">确认入库</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-manual" class="tab-pane hidden" data-page-node-id="pgAU4uWzw49Mw1Se0ooQ55"></div>
+
+        <div id="stockin-form-grid" class="form-grid" data-page-node-id="8cZgkLaXOJjprOTKAEntha">
+          <label class="field" data-page-node-id="q22w6wG0ZjJ2xUMnVHlIWU">
+            <span class="field-label" data-page-node-id="6XeHhSE9FYyGlEyMjE0CCw">品牌 *</span>
+            <input id="f-brand" type="text" placeholder="如：品牌名称" list="brand-suggestions" data-page-node-id="sSHAmu23mmQPQR7E6rDEXj">
+            <datalist id="brand-suggestions" data-page-node-id="Vj1z2HpLfjpWw1ExfbgPQw"></datalist>
+          </label>
+          <label class="field" data-page-node-id="9YSsCF2NZDup4gDRe5BI1l">
+            <span class="field-label" data-page-node-id="OmHrbZTNFf105gmvttLDP9">系列（选填）</span>
+            <input id="f-series" type="text" placeholder="如：系列名称" data-page-node-id="Ll06Jnw66alORCyKtr3hMI">
+          </label>
+          <label class="field" data-page-node-id="cvIFegTBuTX9zD3LCfIFvM">
+            <span class="field-label" data-page-node-id="eW2mSWYWlhyCltct3NjPLS">色号（选填）</span>
+            <input id="f-color-code" type="text" placeholder="如：色号" data-page-node-id="OhwtSF4cQ0hssUjdALwgZp">
+          </label>
+          <label class="field" data-page-node-id="GrnMLcMK91ZdUZXSVZUkyk">
+            <span class="field-label" data-page-node-id="UUS508YYrRD9y5xzK7Imn1">购买金额（¥）*</span>
+            <input id="f-price" type="number" min="0" step="0.01" placeholder="0.00" data-page-node-id="bD5lD984ZkksZcKic6li4F">
+          </label>
+          <div id="stockin-dup-hint" class="dup-hint hidden"></div>
+          <div class="field field-wide" data-page-node-id="fFam002">
+            <div class="field-label-row">
+              <span class="field-label" data-page-node-id="fFam003">色系（选填，可多选；「＋ 自定义」可输入任意颜色并保存为标签）</span>
+              <button id="btn-manage-families-stockin" type="button" class="btn-link" title="统一管理色系标签（添加 / 删除）">管理色系</button>
+            </div>
+            <div id="family-chips" class="family-chips" data-page-node-id="fFam004"></div>
+          </div>
+        </div>
+
+        <!-- 新建模式：多行批量录入面板（行内容由 app.js 渲染，行数上限 20） -->
+        <div id="stockin-rows-panel" class="stockin-rows-panel hidden" data-page-node-id="pgRows001">
+          <div id="stockin-rows" class="stockin-rows"></div>
+          <div class="stockin-rows-foot">
+            <button id="btn-add-stockin-row" type="button" class="btn-ghost btn-sm">＋ 添加一项</button>
+            <span id="stockin-rows-hint" class="stockin-rows-hint">还可添加 19 项（上限 20 项）</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot" data-page-node-id="0yrfrhs91Xkztfub8JrDnU">
+        <button class="btn-ghost" type="button" data-close="modal-stockin" data-page-node-id="gbbKmTkh3H73Q5BM5xCqqx">取消</button>
+        <button id="btn-confirm-stockin" type="button" class="btn-primary" data-page-node-id="CEMZUUu7WdCVf9eO7kQHFG">确认入库</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 色系标签管理模态框 ============ -->
+  <div id="modal-families" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>色系标签管理</h3>
+        <button class="modal-close" type="button" data-close="modal-families">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="families-tip">标签用于入库时快速选择色系，自定义色系会自动保存在这里。删除标签不影响已录入的记录，只是不再出现在快速选择中。</p>
+        <div class="families-add-row">
+          <input id="families-input" type="text" maxlength="12" placeholder="新色系名称，如：玫红、裸粉" class="families-input">
+          <button id="btn-add-family-tag" type="button" class="btn-primary btn-sm">添加</button>
+        </div>
+        <div class="families-list-head">
+          <span id="families-count" class="families-count"></span>
+          <button id="btn-reset-families" type="button" class="btn-ghost btn-sm">恢复默认</button>
+        </div>
+        <div id="families-tag-list" class="families-tag-list"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-primary" type="button" data-close="modal-families">完成</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 售出登记模态框 ============ -->
+  <div id="modal-sell" class="modal-overlay hidden" data-page-node-id="wgBbVFDHjieSsjC8e0CFQ3">
+    <div class="modal" data-page-node-id="C8Jqfm0F7PuYnxH1Aq6HBT">
+      <div class="modal-head" data-page-node-id="wXI1Xp2mUjsAnXDn0lP6Cu">
+        <h3 data-page-node-id="dgEjzpojGYluHHz2dQ4pX2">售出登记</h3>
+        <button class="modal-close" type="button" data-close="modal-sell" data-page-node-id="HwXom0htPJ21ltClJB5erO">×</button>
+      </div>
+      <div class="modal-body" data-page-node-id="rdSLaYaGgCAn6rIOONlopp">
+        <div id="sell-summary" class="sell-summary" data-page-node-id="yPPtWAy093zvoTa3CQHDL4"></div>
+        <div class="form-grid" data-page-node-id="yL53ZHuKFCxWwJnDPV9y8yF">
+          <label class="field" data-page-node-id="Fvn91cGcvLQp4zbCrKAigp">
+            <span class="field-label" data-page-node-id="lWw4ijVP41decoHs4294Bu">售出渠道</span>
+            <select id="sale-channel" class="toolbar-select" data-page-node-id="QAAqGkcwVVf25BHRmfhm3F">
+              <option value="闲鱼" selected data-page-node-id="OYbjOxM3jF3ii3z5Q3XPgu">闲鱼</option>
+              <option value="淘宝" data-page-node-id="ApOYiBV85n1Stuo34GuLH2">淘宝</option>
+              <option value="微信" data-page-node-id="GEgrtuhPIlBiMiEyIEoEsJ">微信</option>
+              <option value="线下" data-page-node-id="DF426oewSlwjUl1f4zIDmr">线下</option>
+              <option value="其他" data-page-node-id="DW9dTWVTJ3sKp9NkulGfek">其他</option>
+            </select>
+          </label>
+          <label class="field" data-page-node-id="4fD9UCGCGQY7AnMv7QfOYY">
+            <span class="field-label" data-page-node-id="1dj5fkqIx5ZyEBx00G3Pjm">售价（¥）*</span>
+            <input id="sale-price" type="number" min="0" step="0.01" placeholder="0.00" data-page-node-id="SevwvTiMkptEvlPQwUhwAk">
+          </label>
+          <label class="field" data-page-node-id="Bwk1wuu2nyhrnYxC9Trs8Z">
+            <span class="field-label" data-page-node-id="QBS1tNwYbRaTbfKDovtKh0">售出日期</span>
+            <input id="sale-date" type="date" data-page-node-id="OoBWw1abMxt33iTYLk5CoB">
+          </label>
+          <label class="field" data-page-node-id="zAK7neQn9qGOjFNSTKkTTs">
+            <span class="field-label" data-page-node-id="BiizT3zevy3A2PYxVBZNRh">备注</span>
+            <input id="sale-notes" type="text" placeholder="买家、包邮情况等（可选）" data-page-node-id="rhrkKZ0PJcUttj5JB6JSRM">
+          </label>
+        </div>
+      </div>
+      <div class="modal-foot" data-page-node-id="JDg6svNehkxJMu8R5DVKR8">
+        <button class="btn-ghost" type="button" data-close="modal-sell" data-page-node-id="zLoPDHLkjrZwhEzDOmLKpQ">取消</button>
+        <button id="btn-confirm-sell" type="button" class="btn-primary" data-page-node-id="npeBfJrZhN11ZpJKYguiqV">确认售出</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 试色图模态框（最多 5 张） ============ -->
+  <div id="modal-realcolor" class="modal-overlay hidden" data-page-node-id="1skiT5QOp9eL9dwBpMzmZ5">
+    <div class="modal" data-page-node-id="yRwNwPQPtNyMlB7N3HH1PM">
+      <div class="modal-head" data-page-node-id="lXzhyNLMk9x8nv4CHXEQNn">
+        <h3 data-page-node-id="aDF31g1XCGEjdOUouNqaMr">试色图</h3>
+        <button class="modal-close" type="button" data-close="modal-realcolor" data-page-node-id="5zZ2DgVMFSgKdkM5mgj9dL">×</button>
+      </div>
+      <div class="modal-body" data-page-node-id="AautN6pGBtevhlnH3x5DXn">
+        <div id="realcolor-summary" class="realcolor-summary" data-page-node-id="hWZAdyCgBF5H6mFDfefbrI"></div>
+        <div id="realcolor-drop" class="dropzone small" data-page-node-id="E9TYFtzkN78thkBOcurS8u">
+          <input id="file-realcolor" type="file" accept="image/*" multiple class="visually-hidden" data-page-node-id="PMUH9wurevPsGJ9wAQAnDw">
+          <div class="dropzone-content" data-page-node-id="xmwBac11U4BSpl0up62aLn">
+            <div class="dropzone-icon small" data-page-node-id="jLI3SwyDbUS3l4yih8rtTt"></div>
+            <p class="dropzone-main" data-page-node-id="otsm0z0zNKovc2WWzutQpW">点击或拖拽上传试色图</p>
+            <p class="dropzone-hint" id="realcolor-hint" data-page-node-id="1H1h6DYXEPw0OmBxZwdUc2">最多上传 5 张，建议上传试色 / 日光下的实拍图</p>
+          </div>
+        </div>
+        <div id="realcolor-list" class="realcolor-list hidden" data-page-node-id="RcList001"></div>
+      </div>
+      <div class="modal-foot" data-page-node-id="xQmPLtVMDJL6SnsuJUsPiS">
+        <button id="btn-remove-realcolor" type="button" class="btn-ghost btn-danger-text" data-page-node-id="GzFJO80IrffqFIt5JSEPfQ">移除试色图</button>
+        <span class="modal-foot-spacer" data-page-node-id="uxGyefQ1JcDDtIbggnjrdC"></span>
+        <button class="btn-ghost" type="button" data-close="modal-realcolor" data-page-node-id="XmKFlKIap7y1DXqB23E90J">取消</button>
+        <button id="btn-confirm-realcolor" type="button" class="btn-primary" data-page-node-id="CVjAgOsFU5fRlXNSmqtI5q">保存试色图</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 试色图查看器 ============ -->
+  <div id="modal-imageview" class="modal-overlay imageview-overlay hidden" data-page-node-id="IvW001">
+    <div class="imageview-box" data-page-node-id="IvW002">
+      <button class="imageview-close" type="button" data-close="modal-imageview" title="关闭">×</button>
+      <img id="imageview-img" class="imageview-img" alt="试色图大图">
+      <div class="imageview-bar">
+        <button id="imageview-prev" class="imageview-nav" type="button" title="上一张">‹</button>
+        <span id="imageview-count" class="imageview-count">1 / 1</span>
+        <button id="imageview-next" class="imageview-nav" type="button" title="下一张">›</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-confirm" class="modal-overlay hidden" data-page-node-id="Zw6iZciOK1ypRqXDpI3U8w">
+    <div class="modal modal-sm" data-page-node-id="EEUoJoTKCRhsNuPbbzUUwI">
+      <div class="modal-head" data-page-node-id="uNHPzki68jI7I1gElkgeXy">
+        <h3 data-page-node-id="AaeDKmDLTVCk2ksGHEQffW">确认操作</h3>
+      </div>
+      <div class="modal-body" data-page-node-id="MGbZbZpKgtTx4K2AN8bXqv">
+        <p id="confirm-text" class="confirm-text" data-page-node-id="11zbcm00iILpvfVZ5G815A"></p>
+      </div>
+      <div class="modal-foot" data-page-node-id="iXedqjdpX8qpypHsD0tpw6">
+        <button id="btn-confirm-cancel" type="button" class="btn-ghost" data-page-node-id="iziDvtahxHtDKVvCcqj5tj">取消</button>
+        <button id="btn-confirm-ok" type="button" class="btn-danger" data-page-node-id="CFVjnsVGQqpwghk27iIEqM">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-root" class="toast-root" data-page-node-id="HyYbGElaJMzWjiZSsTnvVC"></div>
+
+  <script src="app.js?v=20261024c"></script>
+</body>
+</html>
